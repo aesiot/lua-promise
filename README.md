@@ -80,8 +80,8 @@ pme:result( function ( state, arg ) print( 'count:', arg, state ); end )
 ```
 
 如果任务树执行结束则发起result调用：
-× 任务树所有任务成功执行state为true，否则为falsee;
-× 任务树最后一个任务返回的结果arg;
+* 任务树所有任务成功执行state为true，否则为falsee;
+* 任务树最后一个任务返回的结果arg;
 
 ## 5. 示例
 
