@@ -38,9 +38,15 @@ end )
 
 ## 3. 声明嵌套子任务
 
+声明子任务的签名形式：
+
 ```
 pme:go( function( ctx2, arg2 ) end, pos )
+```
 
+典型的结构如下：
+
+```
 pme:go( function ( ctx1, arg )
     //任务过程 。。。
 
