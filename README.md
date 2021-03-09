@@ -20,20 +20,23 @@ local pme = promise:create( {} )
 
 ```
 pme:go( function ( ctx, arg )
-    //任务过程 。。。
+    local ret = 0;
 
-    //如果任务失败
+    --任务过程。。。
+    ret = ret + 1;
+
+    --如果任务失败
     if false then
         ctx.no();
     end
 
-    //任务完成
-    ctx.ok();
+    --任务完成, 返回结果
+    ctx.ok( ret );
 end )
 ```
 
 * promise.go: 在任务树首层尾部声明新的任务，只需要一个任务函数做为参数，函数签名需要满足： function( ctx, arg ) end
-* ctx: 是任务上下文对象，包含反馈任务执行成功或失败的调用。
+* ctx: 是任务上下文对象，包含反馈任务执行成功或失败的调用，调用可接收用户需要向下传递的数据。
 * arg: 任务树中前级任务返回的结果，如果是第一个任务则为创建promise时用户指定的初始参数。
 
 ## 3. 声明嵌套子任务
@@ -48,19 +51,19 @@ pme:go( function( ctx2, arg2 ) end, pos )
 
 ```
 pme:go( function ( ctx1, arg )
-    //任务过程 。。。
+    --任务过程 。。。
 
-    //需要嵌套子任务：
+    --需要嵌套子任务：
     pme:go( function( ctx2, arg2 )
-        //子任务过程 。。。
+        --子任务过程 。。。
 
-        //如果子任务失败
+        --如果子任务失败
         if false then
             ctx2.no();
             ctx1.no();
         end
 
-        //子任务完成
+        --子任务完成
         ctx2.ok();
         ctx1.ok();
     end, ctx1.cur )
