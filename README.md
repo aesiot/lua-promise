@@ -11,10 +11,10 @@ local promise = require( "promise" )
 ## 2. 创建
 
 ```
-local pme = promise:create( {} )
+local pme = promise:create( ... )
 ```
 
-参数为任何可计算结果的表达式，做为用户给后续声明任务的初始数据。
+参数为用户给后续声明任务的初始数据。
 
 ## 3. 声明任务
 
@@ -37,6 +37,8 @@ end )
 
 * promise.go: 在任务树首层尾部声明新的任务，只需要一个任务函数做为参数，函数签名需要满足： function( ctx, arg ) end
 * ctx: 是任务上下文对象，包含反馈任务执行成功或失败的调用，调用可接收用户需要向下传递的数据。
+    - ctx:ok( ... ) 表示任务执行成功，参数为要返回给任务链的下一个环节的数据;
+    - ctx:no( ... ) 表示任务执行失败，参数为要返回给任务链的下一个环节的数据;
 * arg: 任务树中前级任务返回的结果，如果是第一个任务则为创建promise时用户指定的初始参数。
 
 ## 3. 声明嵌套子任务
@@ -50,31 +52,33 @@ pme:go( function( ctx2, arg2 ) end, pos )
 典型的结构如下：
 
 ```
-pme:go( function ( ctx1, arg )
-    --任务过程 。。。
+pme:go( function ( ctx, arg )
+    --父任务过程 。。。
 
-    --需要嵌套子任务：
-    pme:go( function( ctx2, arg2 )
+    --嵌套子任务：
+    pme:go( function( ctx, arg )
         --子任务过程 。。。
 
         --如果子任务失败
         if false then
-            ctx2.no();
-            ctx1.no();
+            --子任务失败
+            ctx.no();
+        else
+            --子任务完成
+            ctx.ok();
         end
+    end, ctx.cur )
 
-        --子任务完成
-        ctx2.ok();
-        ctx1.ok();
-    end, ctx1.cur )
+    -- 父任务完成
+    ctx.ok();
 end )
 ```
 
 promise.go: 在任务树中声明新的下级子任务，需要任务函数和子任务插入位置做为参数:
-* 函数签名需要满足： function( ctx, arg ) end
+* 函数签名需要满足： function( ctx, arg ... ) end
 * 子任务插入位置一般是做为当前任务的子任务，则使用当前任务上下文的： ctx.cur
 
-需要注意： 父子任务的上下文参数命名覆盖往往容易产生问题, 如这里命名为ctx1和ctx2以避免命名覆盖。
+需要注意： 子任务在父任务执行成功后才会开始执行。
 
 ## 4. 同步结果
 

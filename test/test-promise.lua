@@ -80,7 +80,7 @@ function test_dynamic( self )
     end
     
     pme:go( sum )
-    pme:result( function() print( 'sum = ', ret ); end )
+    pme:result( function( state ) print( 'sum = ', ret, state ); end )
 
     print( '------------------ test dynamic -------------------------\n' )
 end
